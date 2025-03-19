@@ -10,30 +10,34 @@ import {
   StatusBar,
   Alert
 } from 'react-native';
-import Zeroconf from 'react-native-zeroconf';
+import {
+  addEventListener,
+  startSearch,
+  stopSearch,
+} from '@inthepocket/react-native-service-discovery';
 
 const ScannerScreen = ({ navigation }) => {
   const [services, setServices] = useState({});
   const [scanning, setScanning] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [serviceTypes, setserviceTypes] = useState([
+    { name: 'mqtt', enabled: true },
+    { name: 'mqtt-ws', enabled: true },
+    { name: 'mqtts', enabled: true },
+    { name: 'mqtt-wss', enabled: true },
+  ]);
 
   let timerRef = useRef(null);
 
-  // Create a zeroconf instance
-  const zeroconf = new Zeroconf();
-
   useEffect(() => {
     // Event listeners for zeroconf
-    zeroconf.on('resolved', service => {
+    addEventListener('serviceFound', service => {
+      console.log('serviceFound:', service);
+
       setServices(prevServices => ({
         ...prevServices,
-        [service.name]: service
+        [service.name + " " + service.type]: service
       }));
-    });
-
-    zeroconf.on('error', error => {
-      console.error('Zeroconf error:', error);
-      Alert.alert('Error', 'Failed to scan for services: ' + error.message);
     });
 
     // Initial scan on component mount
@@ -42,8 +46,9 @@ const ScannerScreen = ({ navigation }) => {
     // Cleanup on unmount
     return () => {
       clearTimeout(timerRef.current);
-      zeroconf.stop();
-      zeroconf.removeDeviceListeners();
+      serviceTypes.map((s) => {
+         stopSearch(s.name);
+      });
     };
   }, []);
 
@@ -52,11 +57,11 @@ const ScannerScreen = ({ navigation }) => {
       setScanning(true);
       setServices({});
 
-      // Stop any existing scan
-      zeroconf.stop();
-
-      // Start scanning for MQTT-WS services
-      zeroconf.scan('mqtt-ws', 'tcp');
+      serviceTypes.map((s) => {
+        if (s.enabled) {
+          startSearch(s.name);
+        }
+      });
 
       // Set a timeout to stop scanning after 10 seconds
       if (timerRef.current != null) {
@@ -64,13 +69,16 @@ const ScannerScreen = ({ navigation }) => {
       }
       timerRef.current = setTimeout(() => {
         if (scanning) {
-          zeroconf.stop();
+          serviceTypes.map((s) => {
+            if (s.enabled) {
+               stopSearch(s.name);
+            }
+          });
           setScanning(false);
         }
       }, 3000);
     } catch (error) {
       console.error('Failed to start scan:', error);
-      Alert.alert('Error', 'Failed to start scan: ' + error.message);
       setScanning(false);
     }
   };
@@ -82,7 +90,9 @@ const ScannerScreen = ({ navigation }) => {
   };
 
   const stopScan = () => {
-    zeroconf.stop();
+    serviceTypes.map((s) => {
+       stopSearch(s.name);
+    });
     setScanning(false);
   };
 
