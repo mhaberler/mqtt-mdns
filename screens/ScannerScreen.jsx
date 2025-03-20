@@ -21,6 +21,8 @@ const ScannerScreen = ({ navigation }) => {
   const [scanning, setScanning] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [serviceTypes, setserviceTypes] = useState([
+    { name: 'http', enabled: true },
+    { name: 'https', enabled: true },
     { name: 'mqtt', enabled: true },
     { name: 'mqtt-ws', enabled: true },
     { name: 'mqtts', enabled: true },

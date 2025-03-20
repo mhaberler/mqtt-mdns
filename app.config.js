@@ -17,8 +17,12 @@ module.exports = {
       supportsTablet: true,
       infoPlist: {
         NSBonjourServices: [
+          "_http._tcp.",
+          "_https._tcp.",
           "_mqtt._tcp.",
-          "_mqtt-ws._tcp."
+          "_mqtt-ws._tcp.",
+          "_mqtts._tcp.",
+          "_mqtt-wss._tcp."
         ],
         NSLocalNetworkUsageDescription: "This app uses the local network to discover MQTT services"
       },
