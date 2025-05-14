@@ -1,0 +1,17 @@
+diff --git a/node_modules/react-native-tcp-socket/src/Socket.js b/node_modules/react-native-tcp-socket/src/Socket.js
+index 4268015..09f250a 100644
+--- a/node_modules/react-native-tcp-socket/src/Socket.js
++++ b/node_modules/react-native-tcp-socket/src/Socket.js
+@@ -328,7 +328,11 @@ export default class Socket extends EventEmitter {
+      */
+     write(buffer, encoding, cb) {
+         const self = this;
+-        if (this._pending || this._destroyed) throw new Error('Socket is closed.');
++        if (this._pending) {
++            this.once('connect', () => this.write(buffer, encoding, cb));
++            return false;
++        }
++        if (this._destroyed) throw new Error('Socket is closed.');
+ 
+         const generatedBuffer = this._generateSendBuffer(buffer, encoding);
+         this._writeBufferSize += generatedBuffer.byteLength;

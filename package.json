@@ -8,7 +8,8 @@
     "android-device": "expo run:android --device",
     "ios-device": "expo run:ios  --device",
     "web": "expo start --web",
-    "ios": "expo run:ios"
+    "ios": "expo run:ios",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@inthepocket/react-native-service-discovery": "^0.2.0",
@@ -22,12 +23,15 @@
     "react": "19.0.0",
     "react-native": "0.79.2",
     "react-native-safe-area-context": "^5.4.0",
-    "react-native-screens": "^4.10.0"
+    "react-native-screens": "^4.10.0",
+    "react-native-tcp-socket": "6.2.0",
+    "mqtt": "5.10.1"
   },
   "devDependencies": {
     "@babel/core": "^7.27.1",
     "@types/react": "~19.0.10",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "patch-package": "^8.0.0"
   },
   "private": true
 }
