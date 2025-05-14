@@ -11,7 +11,12 @@
     "ios": "expo run:ios",
     "postinstall": "patch-package"
   },
+  "react-native": {
+    "net": "react-native-tcp-socket",
+    "tls": "react-native-tcp-socket"
+  },
   "dependencies": {
+    "@generac/react-native-local-network-permission": "^1.2.0",
     "@inthepocket/react-native-service-discovery": "^0.2.0",
     "@react-navigation/native": "^7.1.9",
     "@react-navigation/native-stack": "^7.3.13",
@@ -19,7 +24,6 @@
     "expo-dev-client": "^5.1.8",
     "expo-status-bar": "~2.2.3",
     "expo-system-ui": "~5.0.7",
-    "paho-mqtt": "^1.1.0",
     "react": "19.0.0",
     "react-native": "0.79.2",
     "react-native-safe-area-context": "^5.4.0",

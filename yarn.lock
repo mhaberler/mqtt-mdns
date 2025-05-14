@@ -1049,6 +1049,11 @@
     find-up "^5.0.0"
     js-yaml "^4.1.0"
 
+"@generac/react-native-local-network-permission@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@generac/react-native-local-network-permission/-/react-native-local-network-permission-1.2.0.tgz#b7da1564f5eaec1c9011f9215795bc6fadbe7ef8"
+  integrity sha512-F7GXBz7mOoMehehTbNIrc6vozKx7qTevwpJNLhvtuDJ6rWoCCR38JPRXA/aQWlg6cIYeacXiA6JHP7+8C25xUw==
+
 "@inthepocket/react-native-service-discovery@^0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@inthepocket/react-native-service-discovery/-/react-native-service-discovery-0.2.0.tgz#d2c72607fea35475b0cb6ca4bd53951d98096b51"
@@ -3872,11 +3877,6 @@ package-json-from-dist@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/package-json-from-dist/-/package-json-from-dist-1.0.1.tgz#4f1471a010827a86f94cfd9b0727e36d267de505"
   integrity sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==
-
-paho-mqtt@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/paho-mqtt/-/paho-mqtt-1.1.0.tgz#8c10e29eb162e966fb15188d965c3dce505de9d9"
-  integrity sha512-KPbL9KAB0ASvhSDbOrZBaccXS+/s7/LIofbPyERww8hM5Ko71GUJQ6Nmg0BWqj8phAIT8zdf/Sd/RftHU9i2HA==
 
 parse-json@^4.0.0:
   version "4.0.0"

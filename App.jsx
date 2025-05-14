@@ -7,19 +7,20 @@ import MQTTClientScreen from './screens/MQTTClientScreen';
 
 const Stack = createNativeStackNavigator();
 
+
 const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Scanner">
-        <Stack.Screen 
-          name="Scanner" 
-          component={ScannerScreen} 
-          options={{ title: 'MQTT/MQTT-WS Scanner' }} 
+        <Stack.Screen
+          name="Scanner"
+          component={ScannerScreen}
+          options={{ title: 'MQTT/MQTT-WS DNS-SD Scanner' }}
         />
-        <Stack.Screen 
-          name="MQTTClient" 
-          component={MQTTClientScreen} 
-          options={({ route }) => ({ title: route.params.serviceName })} 
+        <Stack.Screen
+          name="MQTTClient"
+          component={MQTTClientScreen}
+          options={({ route }) => ({ title: route.params.serviceName })}
         />
       </Stack.Navigator>
     </NavigationContainer>

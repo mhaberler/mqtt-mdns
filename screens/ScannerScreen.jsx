@@ -21,8 +21,6 @@ const ScannerScreen = ({ navigation }) => {
   const [scanning, setScanning] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [serviceTypes, setserviceTypes] = useState([
-    { name: 'http', enabled: true },
-    { name: 'https', enabled: true },
     { name: 'mqtt', enabled: true },
     { name: 'mqtt-ws', enabled: true },
     { name: 'mqtts', enabled: true },
@@ -49,7 +47,7 @@ const ScannerScreen = ({ navigation }) => {
     return () => {
       clearTimeout(timerRef.current);
       serviceTypes.map((s) => {
-         stopSearch(s.name);
+        stopSearch(s.name);
       });
     };
   }, []);
@@ -73,7 +71,7 @@ const ScannerScreen = ({ navigation }) => {
         if (scanning) {
           serviceTypes.map((s) => {
             if (s.enabled) {
-               stopSearch(s.name);
+              stopSearch(s.name);
             }
           });
           setScanning(false);
@@ -93,19 +91,14 @@ const ScannerScreen = ({ navigation }) => {
 
   const stopScan = () => {
     serviceTypes.map((s) => {
-       stopSearch(s.name);
+      stopSearch(s.name);
     });
     setScanning(false);
   };
 
   const handleServicePress = (service) => {
     // Navigate to MQTT client screen with service details
-    navigation.navigate('MQTTClient', {
-      serviceName: service.name,
-      host: service.host,
-      port: service.port,
-      addresses: service.addresses,
-    });
+    navigation.navigate('MQTTClient', service);
   };
 
   const renderItem = ({ item }) => {
@@ -141,7 +134,7 @@ const ScannerScreen = ({ navigation }) => {
 
       {scanning && (
         <View style={styles.scanningContainer}>
-          <Text style={styles.scanningText}>Scanning for MQTT-WS services...</Text>
+          <Text style={styles.scanningText}>Scanning for MQTT services...</Text>
         </View>
       )}
 

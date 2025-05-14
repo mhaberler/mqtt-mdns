@@ -1,4 +1,3 @@
-// src/screens/MQTTClientScreen.js
 import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
@@ -9,111 +8,100 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import Paho from 'paho-mqtt';
+
+import { disconnect, onMessage, publish, setupMqtt, subscribe, isConnected } from "../mqtt.js";
 
 const MQTTClientScreen = ({ route, navigation }) => {
-  const { serviceName, host, port, addresses } = route.params;
+  // Holds the mqtt.js client instance across renders
+  const clientRef = useRef(null);
+  const { addresses, domain, hostName, name, port, txt, type } = route.params;
 
   const [connected, setConnected] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState(null);
 
-  const clientRef = useRef(null);
+  const wsPatterns = ['_mqtt-ws._tcp.', '_mqtt-wss._tcp.'];
+  const tlsPatterns = ['_mqtts._tcp.', '_mqtt-wss._tcp.'];
 
-  // Create a unique client ID
-  const clientId = `mqtt_scanner_${Math.random().toString(16).substr(2, 8)}`;
+  const topicName = "#";
 
   useEffect(() => {
     connectToMQTT();
-
     // Clean up on unmount
     return () => {
-      if (clientRef.current && clientRef.current.isConnected()) {
-        clientRef.current.disconnect();
+      if (clientRef.current && isConnected(clientRef.current)) {
+        disconnect(clientRef.current);
       }
     };
   }, []);
 
-  const connectToMQTT = () => {
-    setConnecting(true);
-    setError(null);
-
-    try {
-      // Determine server URI
-      let serverUri;
-      let serverPort = port;
-
-      // Use the first address if available, otherwise use the host
-      const serverAddress = addresses && addresses.length > 0 ? addresses[0] : host;
-
-      // Set up the correct URI based on whether it's WebSocket or not
-
-      serverUri = `ws://${serverAddress}:${serverPort}/mqtt`;
-
-
-      // Create a new client instance
-      const client = new Paho.Client(serverAddress, serverPort, clientId);
-
-      // Set up callbacks
-      client.onConnectionLost = onConnectionLost;
-      client.onMessageArrived = onMessageArrived;
-
-      // Connect the client
-      client.connect({
-        onSuccess: onConnect,
-        onFailure: onConnectFailure,
-        useSSL: false,
-        timeout: 10,
-        reconnect: true,
-        keepAliveInterval: 30,
-      });
-
-      clientRef.current = client;
-    } catch (err) {
-      setError(`Failed to create client: ${err.message}`);
-      setConnecting(false);
-    }
-  };
-
-  const onConnect = () => {
+  const onConnect = (client) => {
     setConnected(true);
     setConnecting(false);
 
     // Subscribe to all topics
     try {
-      clientRef.current.subscribe('#', { qos: 0 });
+      subscribe(client, topicName);
       addMessage('system', 'Connected and subscribed to all topics (#)');
+
     } catch (err) {
       setError(`Failed to subscribe: ${err.message}`);
     }
   };
 
-  const onConnectFailure = (err) => {
-    setError(`Connection failed: ${err.errorMessage}`);
+  const onConnectionError = (client, err) => {
+    setMessages((prev) => [...prev, `Error: ${err.message}`]);
+    setError(`Failed to create client: ${err.message}`);
     setConnecting(false);
   };
 
-  const onConnectionLost = (responseObject) => {
-    if (responseObject.errorCode !== 0) {
-      setError(`Connection lost: ${responseObject.errorMessage}`);
-    }
+  const onConnectionLost = () => {
     setConnected(false);
+    setConnecting(false);
+    setMessages((prev) => [...prev, `Connection lost`]);
   };
 
-  const onMessageArrived = (message) => {
-    const topic = message.destinationName;
-    let payload;
+  const connectToMQTT = async () => {
+    setConnecting(true);
+    setError(null);
 
-    // Try to parse the payload as JSON
+    const serverAddress = addresses && addresses.length > 0 ? addresses[0] : hostName;
     try {
-      payload = JSON.parse(message.payloadString);
-      payload = JSON.stringify(payload, null, 2); // Format JSON for display
-    } catch (e) {
-      payload = message.payloadString;
+      clientRef.current = await setupMqtt({
+        url: serverAddress,
+        port: port,
+        tls: tlsPatterns.some(pattern => type.includes(pattern)),
+        connectionType: wsPatterns.some(pattern => type.includes(pattern)) ? "Websocket" : "TCP",
+        username: "",
+        password: "",
+        onConnect: onConnect,
+        onClose: onConnectionLost,
+        onConnectionError: onConnectionError
+      });
+    } catch (err) {
+      setError(`Connection failed: ${err}`);
+      setConnecting(false);
+      return;
     }
 
-    addMessage(topic, payload);
+    onMessage(clientRef.current, (topic, message) => {
+      let payload;
+      // Try to parse the payload as JSON
+      try {
+        payload = JSON.parse(message);
+        payload = JSON.stringify(payload, null, 2); // Format JSON for display
+      } catch (e) {
+        payload = message;
+      }
+      addMessage(topic, payload);
+    });
+
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      "Connected to broker: " + serverAddress,
+      "Subscribed to topic: " + topicName,
+    ]);
   };
 
   const addMessage = (topic, payload) => {
@@ -129,9 +117,9 @@ const MQTTClientScreen = ({ route, navigation }) => {
     ].slice(0, 100)); // Keep only the last 100 messages
   };
 
-  const disconnect = () => {
-    if (clientRef.current && clientRef.current.isConnected()) {
-      clientRef.current.disconnect();
+  const disconnectClient = () => {
+    if (clientRef.current && isConnected(clientRef.current)) {
+      disconnect(clientRef.current);
       addMessage('system', 'Disconnected from broker');
     }
     setConnected(false);
@@ -162,7 +150,7 @@ const MQTTClientScreen = ({ route, navigation }) => {
 
         <TouchableOpacity
           style={[styles.button, connected ? styles.disconnectButton : styles.connectButton]}
-          onPress={connected ? disconnect : connectToMQTT}
+          onPress={connected ? disconnectClient : connectToMQTT}
           disabled={connecting}
         >
           <Text style={styles.buttonText}>
