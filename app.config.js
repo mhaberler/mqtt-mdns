@@ -28,6 +28,7 @@ module.exports = {
       },
     },
     android: {
+      edgeToEdgeEnabled: true,
       package: "com.haberlerm.mqttmdns",
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
