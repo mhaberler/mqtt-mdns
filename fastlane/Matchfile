@@ -1,0 +1,6 @@
+git_url(ENV["MATCH_GIT_URL"] # no fallback
+storage_mode("git")
+type(ENV["MATCH_TYPE"] || "development")
+app_identifier([ENV["APP_IDENTIFIER"] || "com.haberlerm.mqttmdns"])
+username(ENV["APPLE_ID"])
+team_id(ENV["TEAM_ID"])

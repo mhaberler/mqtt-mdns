@@ -37,3 +37,11 @@ yarn-error.*
 
 android
 ios
+# Fastlane
+fastlane/.env
+fastlane/pc-api-key.json
+fastlane/report.xml
+fastlane/README.md
+
+*.ipa
+*.zip

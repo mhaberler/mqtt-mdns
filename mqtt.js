@@ -17,7 +17,7 @@ export async function setupMqtt(settings) {
     username: settings.username == "" ? undefined : settings.username,
     password: settings.password == "" ? undefined : settings.password,
     rejectUnauthorized: settings.tls,
-    connectTimeout: 4000,
+    connectTimeout: 6000,
   });
   let connectResolved = false;
   let timeoutId;
@@ -40,7 +40,7 @@ export async function setupMqtt(settings) {
       }
       if (!connectResolved) {
         reject(err);
-        disconnect(client);
+        exports.disconnect(client);
       }
     });
   });
@@ -49,7 +49,7 @@ export async function setupMqtt(settings) {
   (timeoutId = setTimeout(() => {
     rej("Connection timed out");
     if (!connectResolved) {
-      disconnect(client);
+      exports.disconnect(client);
     }
   }, 6000))
   );

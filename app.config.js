@@ -24,6 +24,9 @@ module.exports = {
         ],
         NSLocalNetworkUsageDescription: "This app uses the local network to discover MQTT services"
       },
+      config: {
+        usesNonExemptEncryption: false
+      }
     },
     android: {
       edgeToEdgeEnabled: true,

@@ -9,7 +9,13 @@
     "ios-device": "expo run:ios  --device",
     "web": "expo start --web",
     "ios": "expo run:ios",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "build-android-debug-aab": "react-native build-android --mode=debug",
+    "build-android-release-aab": "react-native build-android --mode=release",
+    "build-android-debug-apk": "cd android && ./gradlew assembleDebug && cd ..",
+    "build-android-release-apk": "cd android && ./gradlew assembleRelease && cd ..",
+    "ios-beta": "fastlane ios beta",
+    "android-beta": "fastlane android beta"
   },
   "react-native": {
     "net": "react-native-tcp-socket",
@@ -24,18 +30,19 @@
     "expo-dev-client": "^5.1.8",
     "expo-status-bar": "~2.2.3",
     "expo-system-ui": "~5.0.7",
+    "mqtt": "5.10.1",
     "react": "19.0.0",
     "react-native": "0.79.2",
     "react-native-safe-area-context": "^5.4.0",
     "react-native-screens": "^4.10.0",
-    "react-native-tcp-socket": "6.2.0",
-    "mqtt": "5.10.1"
+    "react-native-tcp-socket": "6.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.27.1",
+    "@react-native-community/cli": "^15.0.1",
     "@types/react": "~19.0.10",
-    "typescript": "^5.8.3",
-    "patch-package": "^8.0.0"
+    "patch-package": "^8.0.0",
+    "typescript": "^5.8.3"
   },
   "private": true
 }

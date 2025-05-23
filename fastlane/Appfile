@@ -1,0 +1,10 @@
+app_identifier(ENV["APP_IDENTIFIER"] || "com.haberlerm.mqttmdns")
+# Set via environment variable
+apple_id(ENV["APPLE_ID"])
+# Set via environment variable
+team_id(ENV["TEAM_ID"])
+# Set via environment variable
+itc_team_id(ENV["ITC_TEAM_ID"])
+
+json_key_file(ENV["GOOGLE_PLAY_JSON_KEY_PATH"] || "./fastlane/google-play-key.json")
+package_name(ENV["PACKAGE_NAME"] || "com.haberlerm.mqttmdns")

@@ -1,0 +1,104 @@
+GOOGLE_PLAY_JSON_KEY = ENV["GOOGLE_PLAY_JSON_KEY_PATH"] || raise("Missing GOOGLE_PLAY_JSON_KEY_PATH")
+ANDROID_PACKAGE_NAME = ENV["ANDROID_PACKAGE_NAME"] || "com.haberlerm.mqttmdns"
+
+default_platform(:ios)
+
+platform(:ios) do
+  desc("Sync certificates and profiles")
+  lane(:sync_certificates) do
+    match(type: "development")
+    match(type: "appstore")
+  end
+
+  desc("Build and deploy to TestFlight")
+  lane(:beta) do
+
+    app_store_connect_api_key(
+      key_id: ENV["FASTLANE_KEY_ID"] || raise("Missing FASTLANE_KEY_ID"),
+      issuer_id: ENV["FASTLANE_ISSUER_ID"] || raise("Missing FASTLANE_ISSUER_ID"),
+      key_filepath: ENV["FASTLANE_KEY_PATH"] || raise("Missing FASTLANE_KEY_PATH"),
+      # optional (maximum 1200)
+      duration: 1200,
+      # optional but may be required if using match/sigh
+      in_house: false
+    )
+
+    # Increment build number
+    increment_build_number(
+      build_number: latest_testflight_build_number + 1,
+      xcodeproj: "ios/mqttmdns.xcodeproj"
+    )
+
+    sync_certificates
+
+    build_ios_app(
+      workspace: "ios/mqttmdns.xcworkspace",
+      scheme: "mqttmdns",
+      export_method: "app-store"
+    )
+
+    upload_to_testflight
+    # Commit the version bump
+    # git_commit(
+    #   path: ["ios/mqttmdns.xcodeproj/project.pbxproj"],
+    #   message: "Bump build number [skip ci]"
+    # )
+  end
+end
+
+platform(:android) do
+  desc("Deploy a new beta build to Google Play")
+  lane(:beta) do
+    gradle(
+      task: "clean",
+      project_dir: "android"
+    )
+
+    # lane :increment_version
+    increment_version_code(
+      app_project_dir: "**/app"
+    )
+    increment_version_name(
+      app_project_dir: "**/app",
+      # Options: "major", "minor", "patch"
+      bump_type: "patch"
+    )
+    version = get_version_name(app_project_dir: "**/app")
+    UI.message("Default: #{version}")
+    version_code = get_version_code(app_project_dir: "**/app")
+    UI.message("Default: #{version_code}")
+
+    gradle(
+      task: "bundleRelease",
+      project_dir: "android",
+      properties: {
+        "android.injected.signing.store.file" => ENV["ANDROID_KEYSTORE_PATH"],
+        "android.injected.signing.store.password" => ENV["ANDROID_KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias" => ENV["ANDROID_KEY_ALIAS"],
+        "android.injected.signing.key.password" => ENV["ANDROID_KEY_PASSWORD"]
+      }
+    )
+
+    upload_to_play_store(
+      track: "alpha",
+      aab: "android/app/build/outputs/bundle/release/app-release.aab",
+      json_key: ENV["GOOGLE_PLAY_JSON_KEY_PATH"] || raise("Missing GOOGLE_PLAY_JSON_KEY_PATH"),
+      package_name: ENV["ANDROID_PACKAGE_NAME"] || "com.haberlerm.mqttmdns"
+    )
+  end
+end
+
+lane(:show_version) do
+  version = get_version_name(app_project_dir: "**/app")
+  UI.message("Default: #{version}")
+  version_code = get_version_code(app_project_dir: "**/app")
+  UI.message("Default: #{version_code}")
+end
+
+lane(:test_api) do
+  google_play_track_version_codes(
+    json_key: GOOGLE_PLAY_JSON_KEY,
+    package_name: ANDROID_PACKAGE_NAME,
+    track: "alpha"
+  )
+end
