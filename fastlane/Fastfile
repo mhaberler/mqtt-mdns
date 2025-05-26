@@ -32,11 +32,6 @@ platform(:ios) do
     )
 
     upload_to_testflight
-    # Commit the version bump
-    # git_commit(
-    #   path: ["ios/mqttmdns.xcodeproj/project.pbxproj"],
-    #   message: "Bump build number [skip ci]"
-    # )
   end
 end
 
