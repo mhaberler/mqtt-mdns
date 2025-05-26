@@ -49,10 +49,6 @@ end
 platform(:android) do
   desc("Deploy a new beta build to Google Play")
   lane(:beta) do
-    gradle(
-      task: "clean",
-      project_dir: "android"
-    )
 
     # lane :increment_version
     increment_version_code(
@@ -100,5 +96,12 @@ lane(:test_api) do
     json_key: GOOGLE_PLAY_JSON_KEY,
     package_name: ANDROID_PACKAGE_NAME,
     track: "alpha"
+  )
+end
+
+lane :clean_build do
+  gradle(
+    task: "clean",
+    project_dir: "android"
   )
 end
