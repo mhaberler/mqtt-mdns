@@ -2,7 +2,7 @@ module.exports = {
   expo: {
     name: "mqtt-mdns",
     slug: "mqtt-mdns",
-    version: "1.0.0",
+    version: "1.1.15",
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",
@@ -14,6 +14,7 @@ module.exports = {
     },
     ios: {
       bundleIdentifier: "com.haberlerm.mqttmdns",
+      buildNumber: "1.1.15",
       supportsTablet: true,
       infoPlist: {
         NSBonjourServices: [
@@ -31,6 +32,7 @@ module.exports = {
     android: {
       edgeToEdgeEnabled: true,
       package: "com.haberlerm.mqttmdns",
+      versionCode: 15,
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
         backgroundColor: "#ffffff",
