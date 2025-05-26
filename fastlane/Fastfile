@@ -23,12 +23,6 @@ platform(:ios) do
       in_house: false
     )
 
-    # Increment build number
-    increment_build_number(
-      build_number: latest_testflight_build_number + 1,
-      xcodeproj: "ios/mqttmdns.xcodeproj"
-    )
-
     sync_certificates
 
     build_ios_app(
@@ -50,15 +44,6 @@ platform(:android) do
   desc("Deploy a new beta build to Google Play")
   lane(:beta) do
 
-    # lane :increment_version
-    increment_version_code(
-      app_project_dir: "**/app"
-    )
-    increment_version_name(
-      app_project_dir: "**/app",
-      # Options: "major", "minor", "patch"
-      bump_type: "patch"
-    )
     version = get_version_name(app_project_dir: "**/app")
     UI.message("Default: #{version}")
     version_code = get_version_code(app_project_dir: "**/app")
@@ -104,4 +89,24 @@ lane :clean_build do
     task: "clean",
     project_dir: "android"
   )
+end
+
+desc "Android: Increment versionCode and set versionName to package.json version"
+private_lane :inc_ver_and do
+  package = load_json(json_path: "./package.json")
+  increment_version_code(gradle_file_path: "./android/app/build.gradle")
+  increment_version_name(gradle_file_path: "./android/app/build.gradle", version_name: package['version'])
+end
+
+desc "iOS: Increment buildNumber and set version to package.json version"
+private_lane :inc_ver_ios do
+  package = load_json(json_path: "./package.json")
+  increment_build_number(xcodeproj: "./ios/mqttmdns.xcodeproj")
+  increment_version_number(xcodeproj: "./ios/mqttmdns.xcodeproj", version_number: package['version'])
+end
+
+desc "Bump versions for both platforms"
+lane :bump do
+  inc_ver_ios
+  inc_ver_and
 end
