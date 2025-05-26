@@ -1,4 +1,4 @@
-git_url(ENV["MATCH_GIT_URL"] # no fallback
+git_url(ENV["MATCH_GIT_URL"])
 storage_mode("git")
 type(ENV["MATCH_TYPE"] || "development")
 app_identifier([ENV["APP_IDENTIFIER"] || "com.haberlerm.mqttmdns"])
